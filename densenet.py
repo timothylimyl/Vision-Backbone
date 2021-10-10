@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 # 2d conv as per paper (BN->RELU->Conv) Repeat 1x1 (bottleneck) then 3x3 (composite)
 # bn_factor is set to be 4, in paper it writes 4k where k is growth rate
 # bn_factor is the bottleneck layer (it serves to reduce the dimensionality before 3x3 conv)
@@ -44,17 +45,10 @@ class DenseBlock(nn.Module):
         self.num_layers = num_layers
         # Each feature, you will add i*k of feature maps (concat from preceding layers)
         # The first feature map (in_) you can set to anything.
-        self.dense_layer = []
-        for i in range(num_layers):
-            self.dense_layer.append(
-                DenseLayer(
-                    in_ + i * growth_rate,
-                    bn_factor,
-                    growth_rate
-                ))
+        self.dense_layer = nn.ModuleList(
+            [DenseLayer(in_ + i * growth_rate, bn_factor, growth_rate) for i in range(num_layers)])
 
     def forward(self, x):
-
         # Very important, the feature maps passed forward has to be appended!
         features = [x]  # Form a python list
         # now you go through the layers and append the feature maps as u go along
@@ -92,7 +86,7 @@ class DenseNet(nn.Module):
         )
 
         # After every DenseBlock is a transition layer to downsample.
-        self.Dense_and_Transition = []
+        self.Dense_and_Transition = nn.ModuleList()
         for i, num_layers in enumerate(dense_block_config):
 
             self.Dense_and_Transition.append(DenseBlock(input_channels, num_layers, bn_factor, growth_rate=32))
@@ -125,7 +119,6 @@ class DenseNet(nn.Module):
         x = self.base_features(x)
         for layer in self.Dense_and_Transition:
             x = layer(x)
-
         x = self.classifier(x)
         return x
 
@@ -150,3 +143,8 @@ if __name__ == "__main__":
     print(f"Output shape: {output.shape}, batch size: {batch_size}, number of classes: {num_classes}")
 
 
+    def calculate_parameters(operation):
+        return sum(param.numel() for param in operation.parameters() if param.requires_grad)
+
+
+    print(calculate_parameters(model))
