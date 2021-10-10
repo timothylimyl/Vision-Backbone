@@ -7,6 +7,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchsummary import summary
+from torch.utils.tensorboard import SummaryWriter
+
 
 # Basic building blocks, just call this with different input and output channels accordingly to build up the network
 # This is the block used for resnet18/34.
@@ -124,3 +126,8 @@ if __name__ == "__main__":
     assert output.shape[0] == batch_size and output.shape[1] == num_classes
     print(f"Output shape: {output.shape}, batch size: {batch_size}, number of classes: {num_classes}")
     summary(model, (3, 224, 224))
+
+    # Trying out tensorboard visualiser for PyTorch (`pip install tensorboard` to use)
+    writer = SummaryWriter()
+    writer.add_graph(model, x)
+    writer.close()
