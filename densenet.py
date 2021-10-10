@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-# from torchsummary import summary #not usable
 
 # 2d conv as per paper (BN->RELU->Conv) Repeat 1x1 (bottleneck) then 3x3 (composite)
 # bn_factor is set to be 4, in paper it writes 4k where k is growth rate
@@ -150,5 +149,4 @@ if __name__ == "__main__":
     assert output.shape[0] == batch_size and output.shape[1] == num_classes
     print(f"Output shape: {output.shape}, batch size: {batch_size}, number of classes: {num_classes}")
 
-    # Sadly, it seems that torchsummary don't work for Dense Connectivity set up.
-    # summary(model, (3, 224, 224))
+
