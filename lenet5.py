@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torchsummary import summary
-
+from torch.utils.tensorboard import SummaryWriter
 
 # Design choice: Simple architecture, just use nn.Sequential to group operations (easy to understand)
 class LeNet5(nn.Module):
@@ -44,3 +44,8 @@ if __name__ == "__main__":
 
     print(f"Output shape: {output.shape}, batch size: {batch_size}, number of classes: {num_classes}")
     summary(model, (3, 32, 32))
+
+    # Trying out tensorboard visualiser for PyTorch (`pip install tensorboard` to use)
+    writer = SummaryWriter()
+    writer.add_graph(model, x)
+    writer.close()
