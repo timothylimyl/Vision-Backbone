@@ -73,7 +73,7 @@ comes. Results of the paper also reaffirms that deeper networks can outperform s
 
 [Implementation notes, vgg16.py :]() The Hello World of CNN (3)
 
-[Implementation notes, vgg16_clean.py :]() The Hello World of CNN (4). From here on, you realised that a lot of CNN design has
+[Implementation notes, vgg16_clean.py :]() The Hello World of CNN (4). From here on, it can be observed that a lot of CNN design has
 repetitive layers and the cleaner way to construct the code will be to create a general class/function whenever you feel
 that you are copying and pasting a lot of code.
 
