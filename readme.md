@@ -9,7 +9,7 @@ into a compressed representation that is linked to the values and structure of t
 multitude of changes in the input data. For example, the encoded feature space for images of different breed of dogs will be close to each other despite the 
 pixel values of each image being very different from each other. The vision backbone's goal is to build a compressed feature representation that generalised to a 
 wide range of pixel values to allow for downstream analysis such as trying to classify dogs from other objects. The quality of the encoded feature representation from the backbones directly affects the performance of any downstream tasks. Thus, it is imperative research and engineering
-work to improve vision backbones performance.
+work to improve the performance of vision backbones.
 
 ## Purpose
 
