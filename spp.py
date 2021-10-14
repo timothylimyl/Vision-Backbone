@@ -1,5 +1,11 @@
 '''
-Purpose of the code is to show a simple cnn and how SPP are integrated to it.
+Purpose of the code is to show a simple cnn and how SPP can be integrated to it.
+
+SPP and SPP_Clean class does the exact same thing. I written SPP_Clean as an example of how to streamline the SPP code.
+SPP_Clean class will allow better flexibility in changing multiple scales without a need of changing code.
+
+However, SPP class will give you more flexibility if you want to change the pooling arrangement. For example,
+you may want to do 2 branches of average pooling and 2 branches of max pooling. If so, edit SPP class.
 '''
 
 import torch
@@ -8,7 +14,7 @@ from torchsummary import summary
 
 
 class SPP(nn.Module):
-    def __init__(self, final_channels, pooling_scales):
+    def __init__(self,pooling_scales):
         super().__init__()
 
         self.pool1 = nn.AdaptiveMaxPool2d(pooling_scales[0])
@@ -25,6 +31,17 @@ class SPP(nn.Module):
         return torch.cat([a, b, c], dim=1)
 
 
+class SPP_Clean(nn.Module):
+    def __init__(self, pooling_scales):
+        super().__init__()
+        self.pyramid_pools = nn.ModuleList([nn.AdaptiveMaxPool2d(scales) for scales in pooling_scales])
+        self.flatten = nn.Flatten()
+
+    def forward(self, x):
+        return torch.cat([self.flatten(pool(x)) for pool in self.pyramid_pools], dim=1)
+
+
+
 class SimpleSPP(nn.Module):
     def __init__(self, final_channels, scales, num_classes):
         super().__init__()
@@ -36,7 +53,7 @@ class SimpleSPP(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-        self.spp = SPP(final_channels, scales)
+        self.spp = SPP2(scales)
 
         # Calculate the output of the SPP layer (dependent only on channels and scales)
         fixed_spp_output = 0
