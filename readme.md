@@ -1,5 +1,7 @@
 # Vision Backbones
 
+[Under constant editing, 14/10/21]
+
 Vision backbones networks serves as the feature extractor of input image data. It encodes
 features into a latent space representation which can be utilised/decoded by many downstream vision tasks like 
 image classification, segmentation, object detection, pose estimation, and many more. In other words, vision backbones simplifies the representation of the input data
@@ -153,6 +155,24 @@ plain CNN can be made (ex: ResNet vs VGG with an exact set up). With usage of re
 am currently not interested in as it is pretty much similar to the basic block idea with extra layers and the application of 1x1 convolution
 for bottlenecking (reduction in depth, same idea as proposed in Inception).
 
+###  [Technique] Spatial Pyramid Pooling, Year 2015
+
+[Spatial Pyramid Pooling in Deep Convolutional
+Networks for Visual Recognition](https://arxiv.org/pdf/1406.4729.pdf)
+
+With the introduction of Spatial Pyramid Pooling (SPP) to CNN, we no longer need to rely on a fixed image size input. SPP is used
+at the last convolutional layer to pool together feature maps in a standardised method to ensure a fixed output representation irregardless
+of input size. This is done by using multiple **fixed** pooling filter kernels of different sizes to pool the feature maps
+into a standard output size. As the output of SPP is of a standard size, the amount of fully connected layer nodes that is connected
+to the output of the SPP is fixed and invariant to the size of the input image. As we are not constraint by input image size, we can flexibly
+change the image input size during training to provide different image scales to learn from. 
+
+
+[Implementation notes, spp.py :]() SPP only requires 2 information, the number input channels to the SPP layer and the different pooling scales that you want to use. 
+In the code, you can adjust the height and width of the input, SPP will ensure that a fixed size representation is given to the
+fully connected layers.
+
+
 ---
 ### Pause and reflect
 
@@ -284,8 +304,6 @@ Let the code do the maths for you, play around with the number of filters and ch
 ## Future works
 
 Nothing determined. I will write and code papers that I find interesting, novel and useful.
-
-
 
 
 
