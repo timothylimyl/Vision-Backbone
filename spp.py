@@ -39,6 +39,7 @@ class SPP_Clean(nn.Module):
 
     def forward(self, x):
         return torch.cat([self.flatten(pool(x)) for pool in self.pyramid_pools], dim=1)
+        # you can take out flatten if not connected to a fully connected layer
 
 
 class SimpleSPP(nn.Module):
@@ -80,7 +81,7 @@ if __name__ == "__main__":
     x = torch.randn(batch_size, 3, h, w)
 
     final_channels = 100  # The thing you need to fix is the amount of channels for your layer prior to SPP
-    scales = [1, 4, 8]  # and also fix the pooling scales that you want to use
+    scales = [1, 4, 16]  # and also fix the pooling scales that you want to use
     model = SimpleSPP(final_channels, scales, num_classes)
     output = model(x)
 
