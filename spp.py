@@ -14,7 +14,7 @@ from torchsummary import summary
 
 
 class SPP(nn.Module):
-    def __init__(self,pooling_scales):
+    def __init__(self, pooling_scales):
         super().__init__()
 
         self.pool1 = nn.AdaptiveMaxPool2d(pooling_scales[0])
@@ -41,7 +41,6 @@ class SPP_Clean(nn.Module):
         return torch.cat([self.flatten(pool(x)) for pool in self.pyramid_pools], dim=1)
 
 
-
 class SimpleSPP(nn.Module):
     def __init__(self, final_channels, scales, num_classes):
         super().__init__()
@@ -53,16 +52,15 @@ class SimpleSPP(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-        self.spp = SPP2(scales)
+        self.spp = SPP(scales)  # SPP_Clean gives the same results.
 
         # Calculate the output of the SPP layer (dependent only on channels and scales)
-        fixed_spp_output = 0
-        for i in scales:
-            fixed_spp_output += final_channels * i ** 2
+        fixed_spp_output = sum([final_channels * i ** 2 for i in scales])
 
+        # fc layer input is fixed by spp output size and not the size of the image.
         self.linear = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(fixed_spp_output, num_classes) # fc layer input is fixed by spp output size and not the size of the image.
+            nn.Linear(fixed_spp_output, num_classes)
         )
 
     def forward(self, x):
