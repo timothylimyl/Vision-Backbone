@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+from torch.utils.tensorboard import SummaryWriter
+import torch.onnx
 
 
 # 2d conv as per paper (BN->RELU->Conv) Repeat 1x1 (bottleneck) then 3x3 (composite)
@@ -123,6 +125,10 @@ class DenseNet(nn.Module):
         return x
 
 
+def calculate_parameters(operation):
+    return sum(param.numel() for param in operation.parameters() if param.requires_grad)
+
+
 if __name__ == "__main__":
     batch_size = 10
     num_classes = 1000
@@ -142,9 +148,28 @@ if __name__ == "__main__":
     assert output.shape[0] == batch_size and output.shape[1] == num_classes
     print(f"Output shape: {output.shape}, batch size: {batch_size}, number of classes: {num_classes}")
 
-
-    def calculate_parameters(operation):
-        return sum(param.numel() for param in operation.parameters() if param.requires_grad)
-
-
     print(calculate_parameters(model))
+    model.eval()
+
+    writer = SummaryWriter()
+    writer.add_graph(model, x)
+    writer.close()
+
+
+    # Export the model
+    torch.onnx.export(model,             # model being run
+                      x,                 # model input (or a tuple for multiple inputs)
+                      "densenet.onnx",   # where to save the model (can be a file or file-like object)
+                      export_params=True,        # store the trained parameter weights inside the model file
+                      opset_version=10,          # the ONNX version to export the model to
+                      do_constant_folding=True,  # whether to execute constant folding for optimization
+                      input_names = ['input'],   # the model's input names
+                      output_names = ['output'], # the model's output names
+                      dynamic_axes={'input' : {0 : 'batch_size'},    # variable length axes
+                                    'output' : {0 : 'batch_size'}})
+
+    # Run these command in your terminal:
+    # pip install netron
+    # netron densenet.onnx
+
+    # Click on localhost for visualisation.
