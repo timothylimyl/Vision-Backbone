@@ -170,7 +170,9 @@ change the image input size during training to provide different image scales to
 
 [Implementation notes, spp.py :]() SPP only requires 2 information, the number input channels to the SPP layer and the different pooling scales that you want to use. 
 In the code, you can adjust the height and width of the input, SPP will ensure that a fixed size representation is given to the
-fully connected layers.
+fully connected layers. The max pooling operations used to encode the features into a fixed size representation does
+not require us to strictly follow it, we can flexibly change the all of the operations
+used in SPP.
 
 
 ---
@@ -210,7 +212,7 @@ Thus, the usage of learnable parameters is more efficient due to this dense conn
 
 [Implementation notes, densenet.py :]() Implemented following the paper, the paper is thankfully very clear on its
 implementation and the same configuration scales to all unlike ResNet that introduces a new block. To ensure correctness, 
-I debugged layer/block by layer/block to ensure that the feature map size matches the paper. I hope to visualise the model in the future.
+I debugged layer/block by layer/block to ensure that the feature map size matches the paper.
 
 ### [Technique] SENet/Block 2017 
 
@@ -304,6 +306,14 @@ Let the code do the maths for you, play around with the number of filters and ch
 ## Future works
 
 Nothing determined. I will write and code papers that I find interesting, novel and useful.
+
+[18/10: Of current interest]
+
+1. HRNet
+2. CBAM
+3. ResNest
+4. ViT
+5. Swin
 
 
 
