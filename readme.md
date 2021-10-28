@@ -303,6 +303,48 @@ lesser parameters and operations, the performance of MobileNet is only slightly 
 [Implementation notes, depthwise_separable.py :]() Code to aid understanding in the difference between standard convolution and depthwise separable convolution. 
 Let the code do the maths for you, play around with the number of filters and channels to gain some intuition.
 
+### HRNet, 2019
+
+[High-Resolution Representations for Labeling Pixels and Regions](https://arxiv.org/pdf/1904.04514.pdf)
+
+Before jumping into HRNet, there are a few papers that is of reading interest to get a better overall view of the paper's idea. All the backbone networks that we have previously mentioned (VGG, ResNet, DenseNet, etc) can be further developed to fit dense prediction task such as segmentation where every pixel has a prediction. To allow for dense prediction, the core idea of most dense prediction task papers is to decode/upsample high resolution representation from the encoded low resolution representation that was produced by the backbone CNN network after a series of convolutions and downsampling. The upsampling of low resolution outputs are commonly done through some form of information inter-connection between the encoder/backbone and the decoder/upsampling module to allow for better recovery of high resolution information to make better dense predictions.
+
+Examples of upsampling recovery strategies formulated by research papers in dense prediction tasks:
+
+- [FCN :](https://arxiv.org/pdf/1411.4038.pdf) Recover by adding encoder feature map to interpolated decoder output
+- [SegNet :](https://arxiv.org/pdf/1511.00561.pdf) Recover via pooling indices used in the encoder
+- [DeepLabV3+ :](https://arxiv.org/pdf/1802.02611.pdf) Recover using a single early feature map layers to concatenate with interpolated decoder output
+- [Hourglass :](https://arxiv.org/pdf/1603.06937.pdf)  Recover using feature maps
+
+There are still many research proposal in upsampling/recovering strategies. However, why not do it in the backbone itself? Introducing HRNet.
+
+The author of the paper knows that the key to get great dense predictions is to be able to recover high-resolution representation. 
+However, upsampling/recovering methods are lossy. Thus, it is actually not really a good idea to connect and 
+recover the features map from any typical CNN backbone and call it a day (like most papers above). 
+If we can maintain instead of recovering high resolution representation throughout the whole network, 
+we will get better dense predictions due to greater position sensitivity from high resolution. 
+
+HRNet proposes to connect multi-resolution convolutions in **parallel** with **repeated fusion**.
+In parallel, there is 3 streams of convolutions namely high, medium and low. Each stream is connected to each other 
+either via downsampling or upsampling operations. Figure 2 and Figure 3 in the paper shows very clearly the 
+architecture design of HRNet. 
+
+
+Two important ablation study done in the paper proves that:
+
+1. Maintaining high resolution such as in HRNet provides good improvement in keypoint location error (human pose estimation), but the keypoint type error does not improve. This is done in comparison to SB-ResNet.
+
+2. Fusing resolutions together provides better overall model performance.
+
+This shows that maintaining high resolution provides better position sensitivity while fusion of other resolution streams helps to provide better overall model performance.
+
+I really like this paper because the main focus of it was improving the vision backbone for application of downstream tasks instead of focusing on how to improve the downstream tasks on a fixed backbone design by adding connections. By improving the backbone design to provide high quality representation, you will directly improve all downstream tasks.
+A lot downstream tasks papers are focusing on their specific application and I think totally missed the point on improving the backbone first. 
+
+
+
+[Implementation notes, hrnet.py :]() In progress ...
+
 ## Future works
 
 Nothing determined. I will write and code papers that I find interesting, novel and useful.
@@ -312,8 +354,8 @@ Nothing determined. I will write and code papers that I find interesting, novel 
 1. HRNet
 2. CBAM
 3. ResNest
-4. ViT
-5. Swin
+4. Swin Transformers
+5. RegNet (NAS vs NAD)
 
 
 
