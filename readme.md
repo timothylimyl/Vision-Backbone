@@ -343,7 +343,16 @@ A lot downstream tasks papers are focusing on their specific application and I t
 
 
 
-[Implementation notes, hrnet.py :]() In progress ...
+[Implementation notes, hrnet.py :]() To completely understand how to build HRNet, 
+reference to this two link is very helpful:
+
+1. [Clear graph on the architecture of HRNet](https://2d3d.ai/index.php/2020/06/14/human-pose-estimation-hrnet/)
+2. [Clear implementation and can load official pretrained weights  (but not very clean)](https://github.com/stefanopini/simple-HRNet/blob/master/models/hrnet.py)
+
+The official repository and paper is messy (at least in my opinion) in terms of clarify of implementation. I referred to the 
+above two links to make the code and architecture clear for myself.
+
+
 
 ## Future works
 
