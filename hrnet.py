@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import torch.nn.functional as F
 import torch.onnx
 
 # GLOBALS:
@@ -85,7 +86,7 @@ class StageModule(nn.Module):
             channels = c * (2 ** i)  # Scale channels by 2x for branch with lower resolution,
             # 2x multiplier scales moving from one branch to the next branch.
 
-            # Paper does x4 basic block for each forward sequence in each branch
+            # Paper does x4 basic block for each forward sequence in each branch (x4 basic block considered as a block)
             branch = nn.Sequential(
                 BasicBlock(channels, channels),
                 BasicBlock(channels, channels),
@@ -281,8 +282,14 @@ class HRNet(nn.Module):
             StageModule(stage=4, output_branches=1, c=c),
         )
 
+        # If HRNetV2:
+        number_blocks_stage4 = 2  # number blocks you want to create before fusion
+        self.stage4 = nn.Sequential(*[StageModule(stage=4, output_branches=4, c=c) for _ in range(number_blocks_stage3)])
+
         # Final layer (final_layer)
-        self.final_layer = nn.Conv2d(c, nof_joints, kernel_size=(1, 1), stride=(1, 1))
+        #self.final_layer = nn.Conv2d(c, nof_joints, kernel_size=(1, 1), stride=(1, 1))
+
+
 
     def forward(self, x):
         # Stem:
@@ -309,7 +316,18 @@ class HRNet(nn.Module):
         x = self.stage4(x)
 
         # Final Stage: Connect as u wish
-        x = self.final_layer(x[0])
+        # HRNetV1 Example: (note: then stage 4 will need to do fusion for 1 output branch only)
+        #x = self.final_layer(x[0]) #x[0] cause it is still a list despite a single output at end of stage 4 (HrNetV1)
+
+        # HRNetV2 Example: (follow paper, upsample via bilinear interpolation and to highest resolution size)
+        # Upsampling all the other resolution streams and then concatenate all (rather than adding/fusing like HRNetV1)
+
+        output_h, output_w = x[0].size(2), x[0].size(3) # Upsample to size of highest resolution stream
+        x1 = F.interpolate(x[1], size=(output_h, output_w), mode='bilinear', align_corners=False)
+        x2 = F.interpolate(x[2], size=(output_h, output_w), mode='bilinear', align_corners=False)
+        x3 = F.interpolate(x[3], size=(output_h, output_w), mode='bilinear', align_corners=False)
+
+        x = torch.cat([x[0], x1, x2, x3], dim=1)
 
         return x
 
@@ -323,11 +341,11 @@ if __name__ == '__main__':
         device = torch.device('cuda:0')
     else:
         device = torch.device('cpu')
-
-    model.load_state_dict(
-        torch.load('./pose_hrnet_w48_384x288.pth', map_location=device)
-        # torch.load('./weights/pose_hrnet_w32_256x192.pth')
-    )
+    #
+    # model.load_state_dict(
+    #     torch.load('./pose_hrnet_w48_384x288.pth', map_location=device)
+    #     # torch.load('./weights/pose_hrnet_w32_256x192.pth')
+    # )
 
     model = model.to(device)
 
