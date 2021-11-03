@@ -350,7 +350,9 @@ reference to this two link is very helpful:
 2. [Clear implementation and can load official pretrained weights  (but not very clean)](https://github.com/stefanopini/simple-HRNet/blob/master/models/hrnet.py)
 
 The official repository and paper is messy (at least in my opinion) in terms of clarify of implementation. I referred to the 
-above two links to make the code and architecture clear for myself.
+above two links to make the code and architecture clear for myself. My code implementation is HrNetV2 version.
+
+My interest in HRNet will be to incorporate it with segmentation and detection models. (...In progress)
 
 
 
