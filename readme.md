@@ -1,7 +1,5 @@
 # Vision Backbones
 
-[Under constant editing, 14/10/21]
-
 Vision backbones networks serves as the feature extractor of input image data. It encodes
 features into a latent space representation which can be utilised/decoded by many downstream vision tasks like 
 image classification, segmentation, object detection, pose estimation, and many more. In other words, vision backbones simplifies the representation of the input data
@@ -19,7 +17,7 @@ fully comprehend the proposed ideas. I believe that by reading and implementing
 the vision backbone networks proposed by the research community, we too can formulate our own ideas and 
 do better engineering work instead of treating the outcome of research papers as plug and play.
 
-My core focus will be figuring the inspiration of the paper, the core contribution made and the implementation in code.
+My core focus will be studying the inspiration of the paper, the core contribution made and the implementation in code.
 
 
 ## Vision Backbones through the years
