@@ -87,12 +87,7 @@ class StageModule(nn.Module):
             # 2x multiplier scales moving from one branch to the next branch.
 
             # Paper does x4 basic block for each forward sequence in each branch (x4 basic block considered as a block)
-            branch = nn.Sequential(
-                BasicBlock(channels, channels),
-                BasicBlock(channels, channels),
-                BasicBlock(channels, channels),
-                BasicBlock(channels, channels),
-            )
+            branch = nn.Sequential(*[BasicBlock(channels, channels) for _ in range(4)])
 
             self.branches.append(branch)  # list containing all forward sequence of individual branches.
 
@@ -218,11 +213,12 @@ class HRNet(nn.Module):
             nn.BatchNorm2d(256, eps=1e-05, momentum=BN_MOMENTUM, affine=True, track_running_stats=True),
         )
         # Note that bottleneck module will expand the output channels according to the output channels*block.expansion
+        bn_expansion = Bottleneck.expansion # The channel expansion is set in the bottleneck class.
         self.layer1 = nn.Sequential(
             Bottleneck(64, 64, downsample=downsample),  # Input is 64 for first module connection
-            Bottleneck(256, 64),
-            Bottleneck(256, 64),
-            Bottleneck(256, 64),
+            Bottleneck(bn_expansion * 64, 64),
+            Bottleneck(bn_expansion * 64, 64),
+            Bottleneck(bn_expansion * 64, 64),
         )
 
         # Transition 1 - Creation of the first two branches (one full and one half resolution)
