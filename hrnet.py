@@ -198,7 +198,7 @@ class StageModule(nn.Module):
 
 
 class HRNet(nn.Module):
-    def __init__(self, c=48, nof_joints=17):
+    def __init__(self, c=48):
         super(HRNet, self).__init__()
 
         # Stem:
@@ -226,6 +226,7 @@ class HRNet(nn.Module):
         )
 
         # Transition 1 - Creation of the first two branches (one full and one half resolution)
+        # Need to transition into high resolution stream and mid resolution stream
         self.transition1 = nn.ModuleList([
             nn.Sequential(
                 nn.Conv2d(256, c, kernel_size=3, stride=1, padding=1, bias=False),
@@ -240,22 +241,12 @@ class HRNet(nn.Module):
         ])
 
         # Stage 2 (stage2)  - Second module with 1 group of bottleneck (resnet) modules. This has 2 branches
+        number_blocks_stage2 = 1
         self.stage2 = nn.Sequential(
-            StageModule(stage=2, output_branches=2, c=c),
-        )
+            *[StageModule(stage=2, output_branches=2, c=c) for _ in range(number_blocks_stage2)])
 
         # Transition 2  - Creation of the third branch (1/4 resolution)
-        # actually all none calls can be taken out but official pre-trained registered None to the module.
-        # so you need to allow it to basically load nothing (from state_dict). can delete if training yourself.
-        self.transition2 = nn.ModuleList([
-            nn.Sequential(),  # None,   - Used in place of "None" because it is callable
-            nn.Sequential(),  # None,   - Used in place of "None" because it is callable
-            nn.Sequential(nn.Sequential(  # Double Sequential to fit with official pretrained weights
-                nn.Conv2d(c * 2, c * (2 ** 2), kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False),
-                nn.BatchNorm2d(c * (2 ** 2), eps=1e-05, momentum=BN_MOMENTUM, affine=True, track_running_stats=True),
-                nn.ReLU(inplace=True),
-            )),
-        ])
+        self.transition2 = self._make_transition_layers(c, transition_number=2)
 
         # Stage 3 (stage3)      - Third module with 4 groups of bottleneck (resnet) modules. This has 3 branches
         number_blocks_stage3 = 4  # number blocks you want to create before fusion
@@ -263,33 +254,20 @@ class HRNet(nn.Module):
             *[StageModule(stage=3, output_branches=3, c=c) for _ in range(number_blocks_stage3)])
 
         # Transition  - Creation of the fourth branch (1/8 resolution)
-        self.transition3 = nn.ModuleList([
-            nn.Sequential(),  # None,   - Used in place of "None" because it is callable
-            nn.Sequential(),  # None,   - Used in place of "None" because it is callable
-            nn.Sequential(),  # None,   - Used in place of "None" because it is callable
-            nn.Sequential(nn.Sequential(  # Double Sequential to fit with official pretrained weights
-                nn.Conv2d(c * (2 ** 2), c * (2 ** 3), kernel_size=3, stride=2, padding=1, bias=False),
-                nn.BatchNorm2d(c * (2 ** 3), eps=1e-05, momentum=BN_MOMENTUM, affine=True, track_running_stats=True),
-                nn.ReLU(inplace=True),
-            )),
-        ])
+        self.transition3 = self._make_transition_layers(c, transition_number=3)
 
-        # Stage 4 (stage4) - Fourth module with 3 groups of bottleneck (resnet) modules. This has 4 branches
-
-        self.stage4 = nn.Sequential(
-            StageModule(stage=4, output_branches=4, c=c),
-            StageModule(stage=4, output_branches=4, c=c),
-            StageModule(stage=4, output_branches=1, c=c),
-        )
-
-        # If HRNetV2:
         number_blocks_stage4 = 2  # number blocks you want to create before fusion
-        self.stage4 = nn.Sequential(*[StageModule(stage=4, output_branches=4, c=c) for _ in range(number_blocks_stage3)])
+        self.stage4 = nn.Sequential(
+            *[StageModule(stage=4, output_branches=4, c=c) for _ in range(number_blocks_stage4)])
 
-        # Final layer (final_layer)
-        #self.final_layer = nn.Conv2d(c, nof_joints, kernel_size=(1, 1), stride=(1, 1))
-
-
+    def _make_transition_layers(self, c, transition_number):
+        return nn.Sequential(
+            nn.Conv2d(c * (2 ** (transition_number - 1)), c * (2 ** transition_number), kernel_size=3, stride=2,
+                      padding=1, bias=False),
+            nn.BatchNorm2d(c * (2 ** transition_number), eps=1e-05, momentum=BN_MOMENTUM, affine=True,
+                           track_running_stats=True),
+            nn.ReLU(inplace=True),
+        )
 
     def forward(self, x):
         # Stem:
@@ -306,48 +284,40 @@ class HRNet(nn.Module):
 
         # Stage 2
         x = self.stage2(x)
-        x.append(self.transition2[-1](x[-1]))
+        x.append(self.transition2(x[-1]))
 
         # Stage 3
         x = self.stage3(x)
-        x.append(self.transition3[-1](x[-1]))
+        x.append(self.transition3(x[-1]))
 
         # Stage 4
         x = self.stage4(x)
 
-        # Final Stage: Connect as u wish
-        # HRNetV1 Example: (note: then stage 4 will need to do fusion for 1 output branch only)
-        #x = self.final_layer(x[0]) #x[0] cause it is still a list despite a single output at end of stage 4 (HrNetV1)
-
         # HRNetV2 Example: (follow paper, upsample via bilinear interpolation and to highest resolution size)
-        # Upsampling all the other resolution streams and then concatenate all (rather than adding/fusing like HRNetV1)
-
-        output_h, output_w = x[0].size(2), x[0].size(3) # Upsample to size of highest resolution stream
+        output_h, output_w = x[0].size(2), x[0].size(3)  # Upsample to size of highest resolution stream
         x1 = F.interpolate(x[1], size=(output_h, output_w), mode='bilinear', align_corners=False)
         x2 = F.interpolate(x[2], size=(output_h, output_w), mode='bilinear', align_corners=False)
         x3 = F.interpolate(x[3], size=(output_h, output_w), mode='bilinear', align_corners=False)
 
+        # Upsampling all the other resolution streams and then concatenate all (rather than adding/fusing like HRNetV1)
         x = torch.cat([x[0], x1, x2, x3], dim=1)
 
         return x
 
 
 if __name__ == '__main__':
-    model = HRNet(48, 17)
-    #model = HRNet(32, 17)
+    model = HRNet(48)
+    # model = HRNet(32)
 
     if torch.cuda.is_available() and False:
         torch.backends.cudnn.deterministic = True
         device = torch.device('cuda:0')
     else:
         device = torch.device('cpu')
-    #
-    # model.load_state_dict(
-    #     torch.load('./pose_hrnet_w48_384x288.pth', map_location=device)
-    #     # torch.load('./weights/pose_hrnet_w32_256x192.pth')
-    # )
 
     model = model.to(device)
-
     y = model(torch.ones(1, 3, 384, 288).to(device))
     print(y.shape)
+
+    pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(pytorch_total_params)
