@@ -193,7 +193,7 @@ class StageModule(nn.Module):
 
 
 class HRNet(nn.Module):
-    def __init__(self, c=48):
+    def __init__(self, c=48, num_blocks = [1,4,3], num_classes = 1000):
         super(HRNet, self).__init__()
 
         # Stem:
@@ -237,7 +237,7 @@ class HRNet(nn.Module):
         ])
 
         # Stage 2 (stage2)  - Second module with 1 group of bottleneck (resnet) modules. This has 2 branches
-        number_blocks_stage2 = 1
+        number_blocks_stage2 = num_blocks[0]
         self.stage2 = nn.Sequential(
             *[StageModule(stage=2, output_branches=2, c=c) for _ in range(number_blocks_stage2)])
 
@@ -245,17 +245,29 @@ class HRNet(nn.Module):
         self.transition2 = self._make_transition_layers(c, transition_number=2)
 
         # Stage 3 (stage3)      - Third module with 4 groups of bottleneck (resnet) modules. This has 3 branches
-        number_blocks_stage3 = 4  # number blocks you want to create before fusion
+        number_blocks_stage3 = num_blocks[1]  # number blocks you want to create before fusion
         self.stage3 = nn.Sequential(
             *[StageModule(stage=3, output_branches=3, c=c) for _ in range(number_blocks_stage3)])
 
         # Transition  - Creation of the fourth branch (1/8 resolution)
         self.transition3 = self._make_transition_layers(c, transition_number=3)
 
-        number_blocks_stage4 = 2  # number blocks you want to create before fusion
+        number_blocks_stage4 = num_blocks[2]  # number blocks you want to create before fusion
         self.stage4 = nn.Sequential(
             *[StageModule(stage=4, output_branches=4, c=c) for _ in range(number_blocks_stage4)])
 
+        # Classifier (extra module if want to use for classification):
+        # pool, reduce dimensionality, flatten, connect to linear layer for classification:
+        out_channels = sum([c * 2 ** i for i in range(len(num_blocks)+1)])  # total output channels of HRNetV2
+        pool_feature_map = 8
+        self.bn_classifier = nn.Sequential(
+            nn.Conv2d(out_channels, out_channels // 4, kernel_size=1, bias=False),
+            nn.BatchNorm2d(out_channels // 4, eps=1e-05, momentum=BN_MOMENTUM, affine=True, track_running_stats=True),
+            nn.ReLU(inplace=True),
+            nn.AdaptiveAvgPool2d(pool_feature_map),
+            nn.Flatten(),
+            nn.Linear(pool_feature_map * pool_feature_map * (out_channels // 4), num_classes),
+        )
     def _make_transition_layers(self, c, transition_number):
         return nn.Sequential(
             nn.Conv2d(c * (2 ** (transition_number - 1)), c * (2 ** transition_number), kernel_size=3, stride=2,
@@ -297,13 +309,14 @@ class HRNet(nn.Module):
 
         # Upsampling all the other resolution streams and then concatenate all (rather than adding/fusing like HRNetV1)
         x = torch.cat([x[0], x1, x2, x3], dim=1)
+        x = self.bn_classifier(x)
 
         return x
 
 
 if __name__ == '__main__':
-    model = HRNet(48)
-    # model = HRNet(32)
+    # model = HRNet(48)
+    model = HRNet(32)
 
     if torch.cuda.is_available() and False:
         torch.backends.cudnn.deterministic = True
