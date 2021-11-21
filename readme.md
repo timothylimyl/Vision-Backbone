@@ -402,7 +402,7 @@ As current personal learning, you can:
 
 - **Add Attention Modules.** Attention modules like CBAM and SEBlock are just basically an intermediate module
   that can learn value of weights from 0 to 1 to recalibrate (multiply) the output of feature maps. It provides the network an internal
-  capacity/capability to prioritise features, and it is learnable. 
+  capacity/capability to prioritise/refine features, and it is learnable. 
   
 
 - **Reconfigure/configure standard convolutions.** We can change the convolution layers to use other convolutions such as Depthwise Separable
