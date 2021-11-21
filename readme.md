@@ -174,7 +174,7 @@ used in SPP.
 
 
 ---
-### Pause and reflect
+### Personal reflection (Prior 2016)
 
 After reading up to here (End of Year 2015), we can easily deduced that the low hanging fruit for researchers 
 seeking to improve the models and publish papers in this domain is to combine the idea of efficient 
@@ -186,6 +186,7 @@ I won't go into these networks at least for now. You can follow this train of id
 
 - [Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/pdf/1611.05431.pdf)
 - [Inception-ResNet](https://arxiv.org/pdf/1602.07261.pdf)
+- [Wide Residual Networks](https://arxiv.org/pdf/1605.07146.pdf)
 
 Also, following from ResNet novel idea of amending the connections from layer to layer, researchers can formulate
 more unique connections design to allow better information flow (easier for the model to optimise).
@@ -374,25 +375,79 @@ My interest in HRNet will be to incorporate it with segmentation and detection m
 
 Edit: Reference to integrating HRNetV2 for Segmentation in DeepLabV3Plus architecture can be found [HERE](https://github.com/timothylimyl/DeepLabV3Plus-Pytorch).
 
----
-### Pause and reflect
-
-A lot of advances has been made in designing the architectures of vision backbone, there are definitely a lot of improvements/ideas we can add onto the published networks in search for a better model like re-configuring standard convolutions and adding attention mechanism. 
-
-My interest next up will looking at the fundamental architecture switch to Transformers and also looking at the potential of Neural Architecture Search (NAS).
 
 ---
-
 ## Future works
 
-Nothing determined. I will write and code papers that I find interesting, novel and useful.
 
-[19/11: Of current interest]
+*19/11: Currently, I am looking at the fundamental architecture switch to Vision Transformers and also learning about the
+potential of Neural Architecture Search (NAS).*
 
-1. CBAM
-2. ResNest
-3. Swin Transformers
-4. RegNet (NAS vs NAD)
+
+---
+## Personal Reflection (Always Learning)
+
+A lot of advances has been made in designing the architectures of vision backbone, 
+there are definitely a lot of improvements/ideas we can add onto the published networks in search for 
+better models in terms of performance and speed.
+
+As of current readings, an AI Practitioner can improve vision backbones by:
+
+#### 1. Re-designing/designing network architectures
+
+Improve upon the current network that your company is using by changing the architecture.
+This can be done by integrating a bunch of different research ideas together or creating a novel connection. 
+As current personal learning, you can:
+
+
+- **Add Attention Modules.** Attention modules like CBAM and SEBlock are just basically an intermediate module
+  that can learn value of weights from 0 to 1 to recalibrate (multiply) the output of feature maps. It provides the network an internal
+  capacity/capability to prioritise features, and it is learnable. 
+  
+
+- **Reconfigure/configure standard convolutions.** We can change the convolution layers to use other convolutions such as Depthwise Separable
+Convolutions and Dilated Convolutions. For example, we can select to change Block2-4 of ResNet Convolutions to Depthwise Separable and
+  observe the change in performance (other variations of this experiment can be done). Configure standard convolutions to small filters (3x3),
+  if your network is using a 7x7 kernel, it may be a good idea to stack three 3x3 kernels instead.
+
+
+- **Re-designing core network architecture.**  If your network is a single branch (all convolutions in series), try widening the network
+using the SAME branch (cardinality). Increasing cardinality has proven to improve the model performance more than increasing depth. You
+  can also try widening using different/custom operations on each branch. Next, you can experiment with either adding or concatenating the features from
+  different branch or even features from a different layer. 
+
+
+- **Use SOTA activation functions.** Try more advanced activation functions other than ReLU and compare results.
+
+#### 2. Model Optimisation
+
+- **Model Pruning**.
+
+- **Optimisation for specific hardware**. Ex: TensorRT for Nvidia GPUs.
+
+- **Quantisation**. Reduce model size, can be use for training (mixed precision training), can definitely be used for inference (fixed model on a
+  lower precision, ex: FP32 -> FP16)
+
+- **Python to C++**. 
+
+
+#### 3. Train appropriately 
+
+- **Use good data augmentations**.
+
+- **Use good optimisers**.
+
+- **Use good learning schedulers**.
+
+- **Use appropriate loss functions**.
+
+
+
+
+        
+
+
+
 
 
 
