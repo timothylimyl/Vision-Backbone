@@ -15,13 +15,13 @@ class SEBlock(nn.Module):
             nn.AvgPool2d(kernel_size=cnn_output_channels), # Get Global Statistic of Each Channel
             # basically you are taking the mean across HxW of the feature maps
             nn.Flatten(),
-            nn.Linear(cnn_output_channels, int(cnn_output_channels / r)),
+            nn.Linear(cnn_output_channels, cnn_output_channels // r),
             nn.ReLU(inplace=True)
         )
 
         # Excite
         self.excite = nn.Sequential(
-            nn.Linear(int(cnn_output_channels / r), cnn_output_channels),
+            nn.Linear(cnn_output_channels // r, cnn_output_channels),
             nn.Sigmoid()
             # sigmoid is used because we want to learn channel-wise dependencies.
             # sigmoid function can emphasise MULTIPLE channels
@@ -77,7 +77,7 @@ class SimpleCNN(nn.Module):
 
 if __name__ == "__main__":
     batch_size = 10
-    num_classes = 1000
+    num_classes = 10
     example_output_channels = 40
     x = torch.randn(batch_size, 3, 64, 64)
     model = SimpleCNN(example_output_channels, num_classes)
