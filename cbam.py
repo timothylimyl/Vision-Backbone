@@ -1,5 +1,5 @@
 '''
-Purpose of the code is to show a simple cnn and how SEBlock are integrated to it.
+Purpose of the code is to show a simple cnn and how CBAM can be integrated to it.
 Comments adds some explanation to the network design.
 '''
 import torch
