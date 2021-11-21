@@ -248,6 +248,25 @@ will boost its performance and the increase in GFLOPs is not significant (minima
 [Implementation notes, SEblock.py :]() I set up a simple standard convolution operation block and then added a SEBlock to it. You can run the code
 and observe that the parameters added by the SEBlock is not much. The code separates Squeeze and Excite operation clearly to aid understanding.
 
+### [Technique] CBAM 2018
+
+[CBAM: Convolutional Block Attention Module](https://arxiv.org/pdf/1807.06521.pdf)
+
+CBAM is pretty much an extension of SEBlock, a lightweight attention module to be added onto a CNN architecture to improve its performance
+without much overhead. Explanation on why/how CBAM work is similar to SEBlock.
+
+The difference with CBAM is that it is a concatenation of both spatial and channel attention maps while
+SEBlock only has channel attention. Another main difference of CBAM is that it uses both max and average pooling (concat together for spatial, addition for channel)
+whereas SEBlock uses only average pooling. It was found in their ablation studies that using both pooling operation together
+is better than 1 (not a new idea, but worth mentioning). Secondly, it was found that putting the attention modules sequentially performs
+better than in parallel for the CBAM.
+
+
+[Implementation notes, cbam.py :]() I set up a simple standard convolution operation block and then added CBAM to it. You can run the code
+and observe that the parameters added by the CBAM is not much. The code separates 
+the CBAM operation clearly to aid understanding.
+
+
 
 ### [Technique] Depthwise seperable convolutions, MobileNet, 2017 
 
