@@ -212,7 +212,7 @@ Thus, the usage of learnable parameters is more efficient due to this dense conn
 implementation and the same configuration scales to all unlike ResNet that introduces a new block. To ensure correctness, 
 I debugged layer/block by layer/block to ensure that the feature map size matches the paper.
 
-### [Technique] SENet/Block 2017 
+### [Technique] SENet/Block, 2017 
 
 
 [Squeeze-and-Excitation Networks](https://arxiv.org/pdf/1709.01507.pdf)
@@ -248,7 +248,7 @@ will boost its performance and the increase in GFLOPs is not significant (minima
 [Implementation notes, SEblock.py :]() I set up a simple standard convolution operation block and then added a SEBlock to it. You can run the code
 and observe that the parameters added by the SEBlock is not much. The code separates Squeeze and Excite operation clearly to aid understanding.
 
-### [Technique] CBAM 2018
+### [Technique] CBAM, 2018
 
 [CBAM: Convolutional Block Attention Module](https://arxiv.org/pdf/1807.06521.pdf)
 
@@ -264,7 +264,8 @@ better than in parallel for the CBAM.
 
 [Implementation notes, cbam.py :]() I set up a simple standard convolution operation block and then added CBAM to it. You can run the code
 and observe that the parameters added by the CBAM is not much. The code separates 
-the CBAM operation clearly to aid understanding.
+the CBAM operation clearly to aid understanding. CBAM consist of the spatial and channel attention, the equation for it is very clearly written in
+the paper (provided in code comments).
 
 
 
