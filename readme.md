@@ -350,21 +350,29 @@ reference to this two link is very helpful:
 The official repository and paper is messy (at least in my opinion) in terms of clarify of implementation. I referred to the 
 above two links to make the code and architecture clear for myself. My code implementation is HrNetV2 version.
 
-My interest in HRNet will be to incorporate it with segmentation and detection models. (...In progress)
+My interest in HRNet will be to incorporate it with segmentation and detection models. 
 
+Edit: Reference to integrating HRNetV2 for Segmentation in DeepLabV3Plus architecture can be found [HERE](https://github.com/timothylimyl/DeepLabV3Plus-Pytorch).
 
+---
+### Pause and reflect
+
+A lot of advances has been made in designing the architectures of vision backbone, there are definitely a lot of improvements/ideas we can add onto the published networks in search for a better model like re-configuring standard convolutions and adding attention mechanism. 
+
+My interest next up will looking at the fundamental architecture switch to Transformers and also looking at the potential of Neural Architecture Search (NAS).
+
+---
 
 ## Future works
 
 Nothing determined. I will write and code papers that I find interesting, novel and useful.
 
-[18/10: Of current interest]
+[19/11: Of current interest]
 
-1. HRNet
-2. CBAM
-3. ResNest
-4. Swin Transformers
-5. RegNet (NAS vs NAD)
+1. CBAM
+2. ResNest
+3. Swin Transformers
+4. RegNet (NAS vs NAD)
 
 
 
