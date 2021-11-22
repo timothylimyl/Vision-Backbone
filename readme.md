@@ -184,9 +184,13 @@ model performance.
 
 I won't go into these networks at least for now. You can follow this train of ideas/papers starting from:
 
-- [Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/pdf/1611.05431.pdf)
 - [Inception-ResNet](https://arxiv.org/pdf/1602.07261.pdf)
 - [Wide Residual Networks](https://arxiv.org/pdf/1605.07146.pdf)
+
+Higly recommended to read, introduction of increasing cardinality to improve model:
+
+- [Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/pdf/1611.05431.pdf) 
+
 
 Also, following from ResNet novel idea of amending the connections from layer to layer, researchers can formulate
 more unique connections design to allow better information flow (easier for the model to optimise).
@@ -267,7 +271,6 @@ better than in parallel for the CBAM.
 and observe that the parameters added by the CBAM is not much. The code separates 
 the CBAM operation clearly to aid understanding. CBAM consist of the spatial and channel attention, the equation for it is very clearly written in
 the paper (provided in code comments).
-
 
 
 ### [Technique] Depthwise seperable convolutions, MobileNet, 2017 
@@ -406,15 +409,11 @@ As current personal learning, you can:
   
 
 - **Reconfigure/configure standard convolutions.** We can change the convolution layers to use other convolutions such as Depthwise Separable
-Convolutions and Dilated Convolutions. For example, we can select to change Block2-4 of ResNet Convolutions to Depthwise Separable and
-  observe the change in performance (other variations of this experiment can be done). Configure standard convolutions to small filters (3x3),
-  if your network is using a 7x7 kernel, it may be a good idea to stack three 3x3 kernels instead.
+Convolutions, Group Convolutions and Dilated Convolutions. For example, we can select to change Block2-4 of ResNet Convolutions to Depthwise Separable and
+  observe the change in performance (other variations of this experiment can be done). It is worth looking into using Group convolutions as it has a lot of potential to improve the performance of the network while reducing computational requirements. Lastly, configure standard convolutions to small filters (3x3), if your network is using a 7x7 kernel, it may be a good idea to stack three 3x3 kernels instead.
 
 
-- **Re-designing core network architecture.**  If your network is a single branch (all convolutions in series), try widening the network
-using the SAME branch (cardinality). Increasing cardinality has proven to improve the model performance more than increasing depth. You
-  can also try widening using different/custom operations on each branch. Next, you can experiment with either adding or concatenating the features from
-  different branch or even features from a different layer. 
+- **Re-designing core network architecture.** Worth to try widening using different/custom operations on each branch. Next, you can also experiment with either adding or concatenating the features from different branch or even features from a different layer. 
 
 
 - **Use SOTA activation functions.** Try more advanced activation functions other than ReLU and compare results.
