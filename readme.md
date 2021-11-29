@@ -253,6 +253,9 @@ will boost its performance and the increase in GFLOPs is not significant (minima
 [Implementation notes, SEblock.py :]() I set up a simple standard convolution operation block and then added a SEBlock to it. You can run the code
 and observe that the parameters added by the SEBlock is not much. The code separates Squeeze and Excite operation clearly to aid understanding.
 
+**Side note: To improve SEBlock, we can use 1D convolutions instead of mlp and dimensionality reduction is not required. [Reference: ECA](https://arxiv.org/pdf/1910.03151.pdf)**
+
+
 ### [Technique] CBAM, 2018
 
 [CBAM: Convolutional Block Attention Module](https://arxiv.org/pdf/1807.06521.pdf)
