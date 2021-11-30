@@ -217,6 +217,9 @@ Thus, the usage of learnable parameters is more efficient due to this dense conn
 implementation and the same configuration scales to all unlike ResNet that introduces a new block. To ensure correctness, 
 I debugged layer/block by layer/block to ensure that the feature map size matches the paper.
 
+**Additional Note: It is actually not necessary to connect every preceding layers as done in DenseNet, we can just drop off many of the connections on the later layers. Reference: [SparseNet: A Sparse DenseNet for Image
+Classification](https://arxiv.org/pdf/1804.05340.pdf)
+
 ### [Technique] SENet/Block, 2017 
 
 
