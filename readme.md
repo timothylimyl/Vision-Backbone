@@ -187,7 +187,7 @@ I won't go into these networks at least for now. You can follow this train of id
 - [Inception-ResNet](https://arxiv.org/pdf/1602.07261.pdf)
 - [Wide Residual Networks](https://arxiv.org/pdf/1605.07146.pdf)
 
-Higly recommended to read, introduction of increasing cardinality to improve model:
+Highly recommended to read, introduction of increasing cardinality to improve model:
 
 - [Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/pdf/1611.05431.pdf) 
 
@@ -393,6 +393,7 @@ Edit: Reference to integrating HRNetV2 for Segmentation in DeepLabV3Plus archite
 potential of Neural Architecture Search (NAS).*
 
 
+
 ---
 ## Personal Reflection (Always Learning)
 
@@ -422,7 +423,7 @@ Convolutions, Group Convolutions and Dilated Convolutions. For example, we can s
 - **Re-designing core network architecture.** Worth to try widening using different/custom operations on each branch. Next, you can also experiment with either adding or concatenating the features from different branch or even features from a different layer. 
 
 
-- **Use SOTA activation functions.** Try more advanced activation functions other than ReLU and compare results.
+- **Use SOTA activation functions.** Try more advance/different activation functions other than ReLU and compare results.
 
 #### 2. Model Optimisation
 
@@ -446,6 +447,8 @@ Convolutions, Group Convolutions and Dilated Convolutions. For example, we can s
 
 - **Use appropriate loss functions**.
 
+
+#### 4. Knowledge Distillation / Model Compression
 
 
 
